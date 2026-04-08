@@ -102,3 +102,10 @@ https://github.com/saifudinreza/marketplace-api
 <p align="center">
   🔥 Never stop learning — Your future self is watching 🔥
 </p>
+
+## 🐍 Contribution Snake
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/saifudinreza/saifudinreza/output/github-contribution-grid-snake.svg" />
+</p>
+
