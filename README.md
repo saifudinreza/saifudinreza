@@ -8,8 +8,7 @@
 
 ## 🚀 About Me
 
-* 💼 Currently working as **Factory Worker**
-* 🎓 Student of **Information Systems (Semester 7)**
+* 🎓 Student of **Information Systems (Semester 8)**
 * 🌱 Learning **Fullstack Development (Laravel + React)**
 * 🎯 Goal: Become **Professional Software Engineer**
 * ⚡ Strong mindset: *Consistent > Perfect*
@@ -18,7 +17,6 @@
 
 ## 🧠 My Journey
 
-> From working full-time in a factory to learning coding every day after work.
 > Building projects step by step to become a real developer 🚀
 
 ---
