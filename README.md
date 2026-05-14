@@ -48,29 +48,22 @@
 
 ## 🛒 Featured Project
 
-### 🔥 Marketplace API
-
-RESTful API built with Laravel
-
-✨ Features:
-
-* Authentication (Login, Register, Logout)
-* Category & Product Management
-* Clean API structure
-
-🔗 Repository:
-https://github.com/saifudinreza/marketplace-api
-
+### 🛒 ZFlux — Fullstack Marketplace App
+> A complete marketplace built from scratch and deployed to production. Not a tutorial clone.
+ 
+**Live:** [marketplace-app-alpha-seven.vercel.app](https://marketplace-app-alpha-seven.vercel.app)
+**Repo:** [github.com/saifudinreza/marketplace-app](https://github.com/saifudinreza/marketplace-app)
+ 
+**What's inside:**
+- Role-based auth (Buyer / Seller) — protected routes on both frontend and backend
+- Full product management for sellers — add, edit, delete, with image upload
+- Shopping cart + checkout flow with interactive map for shipping address (Leaflet)
+- Real payment gateway integration — **Midtrans Snap** with webhook handling
+- Deployed: React on **Vercel**, Laravel API on **Railway** (Docker), MySQL on Railway
+**Stack:** React 19 · Vite · Tailwind CSS v4 · Laravel 13 · Sanctum · Midtrans · MySQL
+ 
 ---
 
-## 🧪 Tools & Workflow
-
-* 🔹 Postman (API Testing)
-* 🔹 Git & GitHub (Version Control)
-* 🔹 REST API Development
-* 🔹 MVC Architecture
-
----
 
 ## 🏆 Achievements (In Progress 🚀)
 
