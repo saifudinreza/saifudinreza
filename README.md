@@ -1,7 +1,7 @@
 <h1 align="center">Hi 👋, I'm Saifudin Reza</h1>
 
 <p align="center">
-  <img src="https://readme-typing-svg.herokuapp.com?color=00F7FF&center=true&vCenter=true&lines=Fullstack+Developer+in+Progress;Laravel+%7C+React+%7C+API+Developer;From+Factory+Worker+to+Software+Engineer🚀" />
+  <img src="https://readme-typing-svg.herokuapp.com?color=00F7FF&center=true&vCenter=true&lines=Fullstack+Developer+in+Progress;" />
 </p>
 
 ---
