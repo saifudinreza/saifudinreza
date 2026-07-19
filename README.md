@@ -6,18 +6,18 @@
 
 ---
 
-## 🚀 About Me
+##  About Me
 
-- 🎓 Final-semester **Information Systems** student at Universitas Terbuka
-- 💼 Working full-time while building production apps in the evenings
-- 🏁 Graduate of **Dibimbing.id Full Stack Web Development Bootcamp**
-- 🤖 Focused on **Laravel + Next.js/React**, with AI features (Groq LLaMA) integrated into real projects
-- 🎯 Actively looking for a **Junior Software Engineer** role or paid internship
-- ⚡ Mindset: *Consistent > Perfect*
+-  Final-semester **Information Systems** student at Universitas Terbuka
+-  Working full-time while building production apps in the evenings
+-  Graduate of **Dibimbing.id Full Stack Web Development Bootcamp**
+-  Focused on **Laravel + Next.js/React**, with AI features (Groq LLaMA) integrated into real projects
+-  Actively looking for a **Junior Software Engineer** role or paid internship
+-  Mindset: *Consistent > Perfect*
 
 ---
 
-## 🛠️ Tech Stack
+##  Tech Stack
 
 <p align="center">
   <img src="https://skillicons.dev/icons?i=laravel,nextjs,react,ts,js,php,mysql,tailwind,docker,git,github,vscode,html,css" />
@@ -25,7 +25,7 @@
 
 ---
 
-## 📊 GitHub Stats
+##  GitHub Stats
 
 <p align="center">
   <img src="https://github-readme-activity-graph.vercel.app/graph?username=saifudinreza&theme=tokyo-night&hide_border=true" />
@@ -37,12 +37,12 @@
 
 ---
 
-## 🌟 Featured Project
+##  Featured Project
 
-### 🧾 KasirAI — AI-Powered POS System
+###  KasirAI — AI-Powered POS System
 > Full-stack Point of Sale app built as my bootcamp capstone, with an AI assistant for natural-language sales analysis.
 
-**Live:** [pos-system-seven-rose.vercel.app](https://pos-system-seven-rose.vercel.app)
+**Live:** [https://sikasirai.com](https://sikasirai.com)
 **Repo:** [github.com/saifudinreza/pos-system](https://github.com/saifudinreza/pos-system)
 
 **What's inside:**
@@ -57,27 +57,27 @@
 
 ---
 
-## 🧩 More Projects
+##  More Projects
 
 | Project | Description | Stack | Link |
 |---|---|---|---|
 | **ZFlux** | Role-based marketplace (Buyer/Seller) with map-based checkout & Midtrans payments | React 19 · Vite · Tailwind CSS v4 · Laravel · Sanctum · MySQL | [Live](https://marketplace-app-alpha-seven.vercel.app) · [Repo](https://github.com/saifudinreza/marketplace-app) |
-| **KostKu** 🚧 | SaaS boarding house management platform — multi-property, tenant & invoice tracking, AI assistant | Next.js 15 (TypeScript) · Laravel 11 · MySQL · TanStack Query/Table · Groq API | In active development |
+| **KostKu**  | SaaS boarding house management platform — multi-property, tenant & invoice tracking, AI assistant | Next.js 15 (TypeScript) · Laravel 11 · MySQL · TanStack Query/Table · Groq API | In active development |
 | **RentWheels** | Vehicle rental booking platform with interactive calendar & date-range booking flow | HTML5 · CSS3 · Vanilla JavaScript | [Live](https://projek-booking-sewa.vercel.app) |
 
 ---
 
-## 🏆 Progress
+##  Progress
 
-- ✅ Shipped 2 full-stack apps to production (KasirAI, ZFlux)
-- ✅ Integrated real payment gateway (Midtrans) and AI features (Groq LLaMA) into live projects
-- ✅ Comfortable across the full stack: Laravel REST APIs ↔ React/Next.js frontends
-- 🔄 Building KostKu (Next.js 15 + TypeScript SaaS dashboard)
-- 🎯 Next: landing a Junior Software Engineer role or internship
+-  Shipped 2 full-stack apps to production (KasirAI, ZFlux)
+-  Integrated real payment gateway (Midtrans) and AI features (Groq LLaMA) into live projects
+-  Comfortable across the full stack: Laravel REST APIs ↔ React/Next.js frontends
+-  Building KostKu (Next.js 15 + TypeScript SaaS dashboard)
+-  Next: landing a Junior Software Engineer role or internship
 
 ---
 
-## 🌐 Connect With Me
+##  Connect With Me
 
 <p align="center">
   <a href="https://github.com/saifudinreza">
@@ -93,14 +93,14 @@
 
 ---
 
-## 💡 Quote
+##  Quote
 
-> "Start from where you are. Use what you have. Do what you can." 🚀
+> "Start from where you are. Use what you have. Do what you can." 
 
 ---
 
 <p align="center">
-  🔥 Never stop learning — your future self is watching 🔥
+   Never stop learning — your future self is watching 
 </p>
 
 ![snake gif](https://github.com/saifudinreza/saifudinreza/blob/output/github-snake-dark.svg)
