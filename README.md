@@ -37,6 +37,20 @@
 
 ---
 
+##  LeetCode Progress
+
+<p align="center">
+  <img src="https://leetcard.jacoblin.cool/saifudinreza?theme=dark" />
+</p>
+
+<p align="center">
+  <img src="https://leetcode-badge-showcase.vercel.app/api?username=saifudinreza&theme=dark" alt="LeetCode Badges" />
+</p>
+
+> Rebuilding DSA fundamentals for technical interviews — daily practice log. Currently focused on **Array, HashMap & String** patterns.
+
+---
+
 ##  Featured Project
 
 ###  KasirAI — AI-Powered POS System
@@ -73,6 +87,7 @@
 -  Integrated real payment gateway (Midtrans) and AI features (Groq LLaMA) into live projects
 -  Comfortable across the full stack: Laravel REST APIs ↔ React/Next.js frontends
 -  Building KostKu (Next.js 15 + TypeScript SaaS dashboard)
+-  Sharpening algorithm & data structure fundamentals on LeetCode
 -  Next: landing a Junior Software Engineer role or internship
 
 ---
