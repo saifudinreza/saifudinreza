@@ -1,0 +1,675 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Saifudin Reza · Project Orbit 3D</title>
+<meta name="description" content="Interactive 3D map of Saifudin Reza's projects: KasirAI, TrustPay, KostKu, AgentMon and Loka Living.">
+<meta name="theme-color" content="#070f14">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='14' fill='%2300F7FF'/%3E%3Cellipse cx='32' cy='32' rx='29' ry='10' fill='none' stroke='%2300F7FF' stroke-width='3' transform='rotate(-20 32 32)'/%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg: #070f14;
+    --ink: #e6fbff;
+    --muted: #8fb7bf;
+    --cyan: #00f7ff;
+    --teal: #16697a;
+    --glass: rgba(8, 22, 28, .88);
+    --line: rgba(0, 247, 255, .22);
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    background: radial-gradient(ellipse at 50% 42%, #0f2a33 0%, #0a1a21 38%, var(--bg) 75%);
+    color: var(--ink);
+    font-family: var(--sans);
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  #stage { position: fixed; inset: 0; z-index: 0; }
+  #stage canvas { display: block; touch-action: none; outline: none; }
+  .labels { position: absolute; inset: 0; pointer-events: none; }
+
+  .chip {
+    pointer-events: auto;
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 5px 11px 5px 9px;
+    border-radius: 999px;
+    border: 1px solid color-mix(in srgb, var(--c) 45%, transparent);
+    background: rgba(7, 17, 22, .72);
+    color: var(--c);
+    font: 600 12.5px/1 var(--mono);
+    cursor: pointer;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+    white-space: nowrap;
+  }
+  .chip::before {
+    content: ""; width: 7px; height: 7px; border-radius: 50%;
+    background: var(--c); box-shadow: 0 0 8px var(--c);
+  }
+  .chip:hover, .chip.hot, .chip[aria-pressed="true"] {
+    transform: scale(1.08);
+    background: color-mix(in srgb, var(--c) 16%, rgba(7, 17, 22, .85));
+    box-shadow: 0 0 18px color-mix(in srgb, var(--c) 45%, transparent);
+  }
+  .chip:focus-visible { outline: 2px solid var(--c); outline-offset: 3px; }
+
+  header.top {
+    position: fixed; top: 0; left: 0; right: 0;
+    display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;
+    padding: max(18px, env(safe-area-inset-top)) 22px 0;
+    pointer-events: none;
+    z-index: 2;
+  }
+  header.top > * { pointer-events: auto; }
+  .brand h1 { margin: 0; font-size: 20px; letter-spacing: .2px; }
+  .brand p { margin: 4px 0 0; color: var(--muted); font: 500 12.5px/1.4 var(--mono); }
+  .brand p b { color: var(--cyan); font-weight: 600; }
+  nav.links { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+  nav.links a {
+    color: var(--ink); text-decoration: none;
+    font: 600 12.5px/1 var(--mono);
+    padding: 8px 12px; border-radius: 10px;
+    border: 1px solid var(--line); background: rgba(7, 17, 22, .55);
+  }
+  nav.links a:hover { border-color: var(--cyan); color: var(--cyan); }
+
+  .hint {
+    position: fixed; left: 50%; bottom: max(18px, env(safe-area-inset-bottom)); transform: translateX(-50%);
+    color: var(--muted); font: 500 12px/1 var(--mono); letter-spacing: .3px;
+    padding: 9px 14px; border-radius: 999px; border: 1px solid var(--line);
+    background: rgba(7, 17, 22, .55); white-space: nowrap;
+    transition: opacity .3s ease;
+    z-index: 2;
+  }
+  body.has-panel .hint { opacity: 0; }
+
+  .panel {
+    position: fixed; left: 22px; bottom: 22px; width: min(400px, calc(100vw - 44px));
+    max-height: calc(100vh - 140px); overflow: auto;
+    padding: 20px 20px 16px;
+    border-radius: 18px;
+    border: 1px solid color-mix(in srgb, var(--c, var(--cyan)) 40%, transparent);
+    background: var(--glass);
+    backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, .45), 0 0 40px color-mix(in srgb, var(--c, var(--cyan)) 14%, transparent);
+    transform: translateY(16px); opacity: 0; pointer-events: none;
+    transition: transform .28s ease, opacity .28s ease;
+    z-index: 3;
+  }
+  .panel.open { transform: none; opacity: 1; pointer-events: auto; }
+  .panel .close {
+    position: absolute; top: 10px; right: 10px;
+    width: 32px; height: 32px; border-radius: 10px;
+    border: 1px solid var(--line); background: transparent; color: var(--ink);
+    font-size: 18px; cursor: pointer;
+  }
+  .panel .close:hover { border-color: var(--c); color: var(--c); }
+  .status { display: inline-block; font: 600 11px/1 var(--mono); letter-spacing: .4px; text-transform: uppercase;
+    padding: 5px 8px; border-radius: 6px; color: var(--c); background: color-mix(in srgb, var(--c) 14%, transparent); }
+  .panel h2 { margin: 10px 0 2px; font-size: 22px; color: var(--c); }
+  .panel .tag { margin: 0 0 10px; color: var(--muted); font: 500 12.5px/1.4 var(--mono); }
+  .panel .desc { margin: 0 0 10px; line-height: 1.55; font-size: 14.5px; }
+  .panel ul { margin: 0 0 12px; padding-left: 18px; line-height: 1.5; font-size: 13.5px; color: #cfe9ee; }
+  .panel ul li { margin-bottom: 4px; }
+  .stack { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+  .stack span { font: 500 11.5px/1 var(--mono); padding: 5px 7px; border-radius: 6px; border: 1px solid var(--line); color: var(--muted); }
+  .actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .actions a {
+    text-decoration: none; font: 700 13px/1 var(--mono);
+    padding: 10px 14px; border-radius: 10px;
+    color: #031015; background: var(--c);
+  }
+  .actions a.ghost { background: transparent; color: var(--c); border: 1px solid var(--c); }
+  .actions .note { color: var(--muted); font: 500 12px/1.4 var(--mono); }
+  .pager { display: flex; justify-content: space-between; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); }
+  .pager button {
+    background: transparent; border: 0; color: var(--muted); cursor: pointer;
+    font: 600 12px/1 var(--mono); padding: 6px 0;
+  }
+  .pager button:hover { color: var(--c); }
+
+  #fallback { display: none; position: fixed; inset: 0; padding: 90px 22px 22px; overflow: auto; }
+  #fallback ul { list-style: none; padding: 0; max-width: 560px; margin: 0 auto; display: grid; gap: 10px; }
+  #fallback li { padding: 14px 16px; border-radius: 14px; border: 1px solid var(--line); background: var(--glass); }
+  #fallback a { color: var(--cyan); }
+  body.no-webgl #fallback { display: block; }
+  body.no-webgl .hint { display: none; }
+
+  @media (max-width: 720px) {
+    .brand h1 { font-size: 17px; }
+    nav.links a { padding: 7px 10px; font-size: 12px; }
+    .panel { left: 10px; right: 10px; bottom: 10px; width: auto; max-height: 56vh; }
+    .hint { font-size: 11px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .panel, .chip, .hint { transition: none; }
+  }
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.187.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.187.0/examples/jsm/"
+  }
+}
+</script>
+</head>
+<body>
+<div id="stage" aria-hidden="false"></div>
+
+<header class="top">
+  <div class="brand">
+    <h1>Saifudin Reza</h1>
+    <p>Full Stack Developer · <b>Project Orbit</b></p>
+  </div>
+  <nav class="links" aria-label="Profile links">
+    <a href="https://github.com/saifudinreza">GitHub</a>
+    <a href="https://zare-world-portofolio.vercel.app/" target="_blank" rel="noopener noreferrer">Portfolio</a>
+  </nav>
+</header>
+
+<div class="hint" id="hint">Drag to rotate · Scroll to zoom · Click a project</div>
+
+<aside class="panel" id="panel" role="dialog" aria-modal="false" aria-labelledby="p-title" aria-hidden="true">
+  <button class="close" id="p-close" type="button" aria-label="Close details">×</button>
+  <span class="status" id="p-status"></span>
+  <h2 id="p-title"></h2>
+  <p class="tag" id="p-tag"></p>
+  <p class="desc" id="p-desc"></p>
+  <ul id="p-points"></ul>
+  <div class="stack" id="p-stack"></div>
+  <div class="actions" id="p-actions"></div>
+  <div class="pager">
+    <button type="button" id="p-prev">← Previous</button>
+    <button type="button" id="p-next">Next →</button>
+  </div>
+</aside>
+
+<section id="fallback" aria-label="Project list">
+  <ul id="fallback-list"></ul>
+</section>
+
+<noscript>
+  <p style="position:fixed;inset:auto 0 40% 0;text-align:center;font-family:monospace">
+    This page needs JavaScript. See my projects on
+    <a style="color:#00f7ff" href="https://github.com/saifudinreza">GitHub</a>.
+  </p>
+</noscript>
+
+<script type="module">
+const PROJECTS = [
+  {
+    id: 'kasirai', name: 'KasirAI', color: '#00F7FF', ring: 0, t0: 0, dir: 1,
+    status: 'Live', tag: 'AI-Powered Multi-Tenant POS',
+    desc: 'Point of Sale SaaS for Indonesian SMEs with an AI assistant that answers sales questions in natural language from live data.',
+    points: [
+      'Multi-tenant architecture with per-tenant data isolation and per-tenant Midtrans keys',
+      '36 REST API endpoints, role-based auth (Admin/Cashier) via Laravel Sanctum',
+      'AI sales assistant on Groq Llama 3.3 70B, WhatsApp receipts via Fonnte, real-time stock alerts',
+      'Dockerized Laravel API on Railway (Nginx), Next.js on Vercel, custom domain, GA4'
+    ],
+    stack: ['Next.js 14', 'Laravel 11', 'MySQL', 'Zustand', 'Groq Llama 3.3', 'Midtrans', 'Docker'],
+    links: [
+      { label: 'Live: sikasirai.com', href: 'https://sikasirai.com' },
+      { label: 'Repo', href: 'https://github.com/saifudinreza/pos-system', ghost: true }
+    ]
+  },
+  {
+    id: 'trustpay', name: 'TrustPay', color: '#7CFFCB', ring: 1, t0: 1.2, dir: -1,
+    status: 'Live demo', tag: 'Ledger-Based Digital Wallet',
+    desc: 'E-wallet where every rupiah is recorded: top up, peer-to-peer transfer, bill payment, and QR payments.',
+    points: [
+      'Atomic P2P transfers using DB transactions and lockForUpdate, with double-entry ledger rows',
+      'Money math with bcmath, 6-digit PIN on every transfer and payment, anti-enumeration errors',
+      'Top up via Midtrans Snap with webhook confirmation, Google OAuth, WhatsApp OTP login',
+      'Ledger export to CSV and printable PDF'
+    ],
+    stack: ['Laravel 13', 'PHP 8.4', 'React 18', 'Vite', 'PostgreSQL', 'Midtrans', 'Docker', 'Render'],
+    links: [
+      { label: 'Live demo', href: 'https://trust-pay-blush.vercel.app' },
+      { label: 'Repo', href: 'https://github.com/saifudinreza/TrustPay', ghost: true }
+    ]
+  },
+  {
+    id: 'kostku', name: 'KostKu', color: '#7DB8FF', ring: 2, t0: 2.5, dir: 1,
+    status: 'Live', tag: 'Boarding House Management SaaS',
+    desc: 'Dashboard for boarding house owners to manage properties, tenants, and invoices.',
+    points: [
+      '9-table schema and 35+ REST API endpoints',
+      'Tenant and invoice tracking, email notifications, analytics charts',
+      'Next.js frontend on Vercel, Laravel API on Render'
+    ],
+    stack: ['Next.js 16', 'React 19', 'TypeScript', 'Tailwind v4', 'TanStack Query', 'Laravel', 'Recharts'],
+    links: [
+      { label: 'Live', href: 'https://kostku-app-zeta.vercel.app' },
+      { label: 'Repo', href: 'https://github.com/saifudinreza/kostku-app', ghost: true }
+    ]
+  },
+  {
+    id: 'agentmon', name: 'AgentMon', color: '#B794FF', ring: 0, t0: Math.PI, dir: 1,
+    status: 'In progress', tag: 'Review Layer for AI Coding Agents',
+    desc: 'Local-first tool for reviewing what coding agents like Claude Code want to do, with risk levels and policy rules instead of blind approvals.',
+    points: [
+      'Local daemon that receives Claude Code HTTP hooks, bound to 127.0.0.1 only',
+      'Layered request checks: Host validation against DNS rebinding, browser request rejection, bearer token auth',
+      'Privacy by default: logs record event and tool names, never code or commands',
+      'Shared event contract in a pnpm monorepo, built issue by issue through pull requests'
+    ],
+    stack: ['TypeScript', 'pnpm workspaces', 'Vitest', 'Claude Code Hooks'],
+    links: [],
+    note: 'Private until beta'
+  },
+  {
+    id: 'loka', name: 'Loka Living', color: '#FFC46B', ring: 1, t0: 1.2 + Math.PI, dir: -1,
+    status: 'In progress', tag: 'Furniture E-Commerce',
+    desc: 'Furniture storefront with a warm, eco-inspired design, animated product transitions, and a full checkout flow. Built spec-first from a PRD and technical docs.',
+    points: [],
+    stack: ['Next.js 14', 'TypeScript', 'Bun', 'Elysia', 'Drizzle ORM', 'PostgreSQL', 'Zustand', 'Zod'],
+    links: [{ label: 'Repo', href: 'https://github.com/saifudinreza/Loka-living' }]
+  }
+];
+
+const $ = (id) => document.getElementById(id);
+const el = (tag, props = {}, text) => {
+  const node = Object.assign(document.createElement(tag), props);
+  if (text !== undefined) node.textContent = text;
+  return node;
+};
+
+function showFallback() {
+  document.body.classList.add('no-webgl');
+  const list = $('fallback-list');
+  list.replaceChildren(...PROJECTS.map((p) => {
+    const li = el('li');
+    li.append(el('strong', {}, p.name), el('div', {}, `${p.tag} · ${p.status}`));
+    p.links.forEach((l) => {
+      li.append(' ', el('a', { href: l.href, target: '_blank', rel: 'noopener noreferrer' }, l.label));
+    });
+    return li;
+  }));
+}
+
+function webglAvailable() {
+  try {
+    const c = document.createElement('canvas');
+    return !!(window.WebGL2RenderingContext && c.getContext('webgl2')) || !!c.getContext('webgl');
+  } catch { return false; }
+}
+
+async function main() {
+  if (!webglAvailable()) { showFallback(); return; }
+
+  const THREE = await import('three');
+  const { OrbitControls } = await import('three/addons/controls/OrbitControls.js');
+  const { CSS2DRenderer, CSS2DObject } = await import('three/addons/renderers/CSS2DRenderer.js');
+
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const rad = THREE.MathUtils.degToRad;
+  const stage = $('stage');
+
+  // ---------- renderer, camera, controls
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setClearColor(0x000000, 0);
+  stage.appendChild(renderer.domElement);
+
+  const labelRenderer = new CSS2DRenderer();
+  labelRenderer.domElement.className = 'labels';
+  stage.appendChild(labelRenderer.domElement);
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 300);
+  camera.position.set(0, 3.0, 10);
+
+  const controls = new OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.06;
+  controls.enablePan = false;
+  controls.minDistance = 3.5;
+  controls.maxDistance = 24;
+  controls.autoRotate = !reduceMotion;
+  controls.autoRotateSpeed = 0.55;
+
+  // ---------- textures
+  function glowTexture() {
+    const c = document.createElement('canvas');
+    c.width = c.height = 128;
+    const g = c.getContext('2d');
+    const grd = g.createRadialGradient(64, 64, 0, 64, 64, 64);
+    grd.addColorStop(0, 'rgba(255,255,255,1)');
+    grd.addColorStop(0.25, 'rgba(255,255,255,.45)');
+    grd.addColorStop(1, 'rgba(255,255,255,0)');
+    g.fillStyle = grd;
+    g.fillRect(0, 0, 128, 128);
+    const t = new THREE.CanvasTexture(c);
+    t.colorSpace = THREE.SRGBColorSpace;
+    return t;
+  }
+  const glowTex = glowTexture();
+
+  function ringTexture() {
+    const c = document.createElement('canvas');
+    c.width = c.height = 128;
+    const g = c.getContext('2d');
+    g.strokeStyle = '#ffffff';
+    g.lineWidth = 3;
+    g.setLineDash([14, 9]);
+    g.beginPath();
+    g.arc(64, 64, 56, 0, Math.PI * 2);
+    g.stroke();
+    const t = new THREE.CanvasTexture(c);
+    t.colorSpace = THREE.SRGBColorSpace;
+    return t;
+  }
+  const ringTex = ringTexture();
+
+  // ---------- globe
+  const R = 1.6;
+  const globe = new THREE.Group();
+  globe.rotation.z = rad(18);
+  scene.add(globe);
+  const spin = new THREE.Group();
+  globe.add(spin);
+
+  spin.add(new THREE.Mesh(
+    new THREE.SphereGeometry(R, 48, 32),
+    new THREE.MeshBasicMaterial({ color: 0x0a3540, transparent: true, opacity: 0.7, depthWrite: false })
+  ));
+  spin.add(new THREE.LineSegments(
+    new THREE.EdgesGeometry(new THREE.SphereGeometry(R * 1.003, 18, 12), 1),
+    new THREE.LineBasicMaterial({ color: 0x00f7ff, transparent: true, opacity: 0.38 })
+  ));
+  const equator = new THREE.Mesh(
+    new THREE.TorusGeometry(R * 1.004, 0.007, 6, 128),
+    new THREE.MeshBasicMaterial({ color: 0x00f7ff, transparent: true, opacity: 0.8 })
+  );
+  equator.rotation.x = Math.PI / 2;
+  spin.add(equator);
+
+  // soft atmosphere (fresnel rim)
+  scene.add(new THREE.Mesh(
+    new THREE.SphereGeometry(R * 1.16, 48, 32),
+    new THREE.ShaderMaterial({
+      side: THREE.BackSide, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+      vertexShader: 'varying vec3 vN; void main(){ vN = normalize(normalMatrix * normal); gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+      fragmentShader: 'varying vec3 vN; void main(){ float rim = 1.0 - abs(dot(vN, vec3(0.0, 0.0, 1.0))); float i = pow(rim, 3.0); gl_FragColor = vec4(0.0, 0.97, 1.0, 1.0) * i * 0.45; }'
+    })
+  ));
+
+  // ---------- orbit rings
+  const RINGS = [
+    { r: 2.85, incl: 22, yaw: 10 },
+    { r: 3.3, incl: -30, yaw: -35 },
+    { r: 2.55, incl: 72, yaw: -25 }
+  ];
+  const pivots = RINGS.map((def) => {
+    const pivot = new THREE.Group();
+    pivot.rotation.set(rad(def.incl), rad(def.yaw), 0, 'YXZ');
+    const ring = new THREE.Mesh(
+      new THREE.TorusGeometry(def.r, 0.008, 6, 200),
+      new THREE.MeshBasicMaterial({ color: 0x2fd0dc, transparent: true, opacity: 0.32 })
+    );
+    ring.rotation.x = Math.PI / 2;
+    pivot.add(ring);
+    scene.add(pivot);
+    return pivot;
+  });
+
+  // ---------- project nodes
+  const nodes = PROJECTS.map((p) => {
+    const group = new THREE.Group();
+    pivots[p.ring].add(group);
+    const color = new THREE.Color(p.color);
+
+    const core = new THREE.Mesh(new THREE.SphereGeometry(0.17, 32, 16), new THREE.MeshBasicMaterial({ color }));
+    const glow = new THREE.Sprite(new THREE.SpriteMaterial({
+      map: glowTex, color, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0.9
+    }));
+    glow.scale.setScalar(1.15);
+    const halo = new THREE.Sprite(new THREE.SpriteMaterial({
+      map: ringTex, color, transparent: true, depthWrite: false, opacity: 0
+    }));
+    halo.scale.setScalar(0.85);
+    const hit = new THREE.Mesh(new THREE.SphereGeometry(0.5, 12, 8), new THREE.MeshBasicMaterial({ visible: false }));
+    hit.userData.id = p.id;
+    group.add(core, glow, halo, hit);
+
+    const chip = el('button', { type: 'button', className: 'chip' }, p.name);
+    chip.style.setProperty('--c', p.color);
+    chip.setAttribute('aria-pressed', 'false');
+    chip.setAttribute('aria-label', `${p.name}: ${p.tag}. Show details`);
+    chip.addEventListener('click', () => select(p.id));
+    chip.addEventListener('pointerenter', () => { hoveredId = p.id; });
+    chip.addEventListener('pointerleave', () => { if (hoveredId === p.id) hoveredId = null; });
+    const label = new CSS2DObject(chip);
+    label.center.set(0.5, -0.9);   // sit just below the planet on screen, whatever the ring tilt
+    group.add(label);
+
+    return { p, group, core, glow, halo, hit, chip, emphasis: 0 };
+  });
+  const byId = Object.fromEntries(nodes.map((n) => [n.p.id, n]));
+
+  // ---------- particles and stars
+  function pointCloud(count, rMin, rMax, flatten, size, color, opacity) {
+    const pos = new Float32Array(count * 3);
+    for (let i = 0; i < count; i++) {
+      const r = rMin + Math.random() * (rMax - rMin);
+      const u = (Math.random() * 2 - 1) * flatten;
+      const a = Math.random() * Math.PI * 2;
+      const s = Math.sqrt(1 - u * u);
+      pos.set([r * s * Math.cos(a), r * u, r * s * Math.sin(a)], i * 3);
+    }
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    return new THREE.Points(geo, new THREE.PointsMaterial({
+      color, size, transparent: true, opacity, depthWrite: false, blending: THREE.AdditiveBlending, sizeAttenuation: true
+    }));
+  }
+  const dust = pointCloud(900, 2.2, 7.5, 0.35, 0.035, 0xbffcff, 0.65);
+  const stars = pointCloud(1400, 35, 80, 1, 0.16, 0xe6ffff, 0.75);
+  scene.add(dust, stars);
+
+  // ---------- layout & sizing
+  function baseDistance() {
+    const halfFov = rad(camera.fov / 2);
+    const needH = 4.6 / Math.tan(halfFov);
+    const needW = 4.6 / (Math.tan(halfFov) * camera.aspect);
+    return Math.max(9.5, needH * 0.92, needW);
+  }
+  function resize() {
+    const w = stage.clientWidth, h = stage.clientHeight;
+    renderer.setSize(w, h);
+    labelRenderer.setSize(w, h);
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+    if (!selected) {
+      const offset = camera.position.clone().sub(controls.target).setLength(baseDistance());
+      camera.position.copy(controls.target).add(offset);
+    }
+  }
+
+  // ---------- selection, panel, camera tween
+  let selected = null;
+  let hoveredId = null;
+  let tween = null;
+  const panel = $('panel');
+
+  function fillPanel(p) {
+    panel.style.setProperty('--c', p.color);
+    $('p-status').textContent = p.status;
+    $('p-title').textContent = p.name;
+    $('p-tag').textContent = p.tag;
+    $('p-desc').textContent = p.desc;
+    $('p-points').replaceChildren(...p.points.map((t) => el('li', {}, t)));
+    $('p-points').hidden = p.points.length === 0;
+    $('p-stack').replaceChildren(...p.stack.map((t) => el('span', {}, t)));
+    const actions = p.links.map((l) => el('a', {
+      href: l.href, target: '_blank', rel: 'noopener noreferrer', className: l.ghost ? 'ghost' : ''
+    }, l.label));
+    if (p.note) actions.push(el('span', { className: 'note' }, p.note));
+    $('p-actions').replaceChildren(...actions);
+  }
+
+  function flyTo(target, dist, ms = 900) {
+    tween = {
+      t: 0, ms,
+      fromT: controls.target.clone(), toT: target.clone(),
+      fromD: camera.position.distanceTo(controls.target), toD: dist
+    };
+  }
+
+  function select(id) {
+    const n = byId[id];
+    if (!n) return;
+    selected = n;
+    nodes.forEach((m) => m.chip.setAttribute('aria-pressed', String(m === n)));
+    fillPanel(n.p);
+    panel.classList.add('open');
+    panel.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('has-panel');
+    scene.updateMatrixWorld();
+    const pos = n.group.getWorldPosition(new THREE.Vector3());
+    if (innerWidth <= 720) pos.add(new THREE.Vector3(0, -1.9, 0).applyQuaternion(camera.quaternion)); // keep node above the bottom sheet
+    else pos.add(new THREE.Vector3(-0.9, 0, 0).applyQuaternion(camera.quaternion)); // shift right of panel
+    flyTo(pos, 6.2);
+  }
+
+  function closePanel() {
+    if (!selected) return;
+    selected = null;
+    nodes.forEach((m) => m.chip.setAttribute('aria-pressed', 'false'));
+    panel.classList.remove('open');
+    panel.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('has-panel');
+    flyTo(new THREE.Vector3(0, 0, 0), baseDistance());
+  }
+
+  function step(delta) {
+    const i = PROJECTS.findIndex((p) => p.id === selected?.p.id);
+    const next = PROJECTS[(i + delta + PROJECTS.length) % PROJECTS.length];
+    select(next.id);
+  }
+
+  $('p-close').addEventListener('click', closePanel);
+  $('p-prev').addEventListener('click', () => step(-1));
+  $('p-next').addEventListener('click', () => step(1));
+  addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closePanel();
+    if (selected && e.key === 'ArrowRight') step(1);
+    if (selected && e.key === 'ArrowLeft') step(-1);
+  });
+
+  // ---------- picking on the canvas
+  const raycaster = new THREE.Raycaster();
+  const ndc = new THREE.Vector2();
+  const hitMeshes = nodes.map((n) => n.hit);
+  function pick(e) {
+    const rect = renderer.domElement.getBoundingClientRect();
+    ndc.set(((e.clientX - rect.left) / rect.width) * 2 - 1, -((e.clientY - rect.top) / rect.height) * 2 + 1);
+    raycaster.setFromCamera(ndc, camera);
+    const hit = raycaster.intersectObjects(hitMeshes, false)[0];
+    return hit ? hit.object.userData.id : null;
+  }
+  let down = null;
+  const canvas = renderer.domElement;
+  canvas.addEventListener('pointerdown', (e) => { down = { x: e.clientX, y: e.clientY }; });
+  canvas.addEventListener('pointerup', (e) => {
+    if (!down) return;
+    const moved = Math.hypot(e.clientX - down.x, e.clientY - down.y);
+    down = null;
+    if (moved > 6) return;
+    const id = pick(e);
+    if (id) select(id);
+    else closePanel();
+  });
+  canvas.addEventListener('pointermove', (e) => {
+    if (e.pointerType !== 'mouse') return;
+    hoveredId = pick(e);
+    canvas.style.cursor = hoveredId ? 'pointer' : 'grab';
+  });
+  canvas.addEventListener('pointerleave', () => { hoveredId = null; });
+
+  // pause auto-rotate while the user drags, resume after a short idle
+  let idleTimer = null;
+  let userHold = false;
+  controls.addEventListener('start', () => { userHold = true; clearTimeout(idleTimer); tween = null; });
+  controls.addEventListener('end', () => {
+    clearTimeout(idleTimer);
+    idleTimer = setTimeout(() => { userHold = false; }, 2500);
+  });
+
+  // ---------- loop
+  const ORBIT_PERIOD = 30;   // seconds per revolution
+  let lastTime = null;
+  let orbitTime = 0;
+  const camDir = new THREE.Vector3();
+  const ease = (k) => 1 - Math.pow(1 - k, 3);
+  const nodeWorld = new THREE.Vector3();
+
+  addEventListener('resize', resize);
+  resize();
+
+  renderer.setAnimationLoop((now) => {
+    const dt = lastTime === null ? 0 : Math.min((now - lastTime) / 1000, 0.05);
+    lastTime = now;
+    const speed = reduceMotion ? 0.25 : 1;
+    const holding = !!selected || !!hoveredId;     // freeze while a project is hovered or open
+    if (!holding) orbitTime += dt * speed;
+    controls.autoRotate = !reduceMotion && !holding && !userHold;
+
+    spin.rotation.y += dt * speed * (Math.PI * 2 / 40);
+    dust.rotation.y += dt * speed * 0.03;
+    stars.rotation.y -= dt * 0.004;
+
+    const dist = camera.position.distanceTo(controls.target);
+    for (const n of nodes) {
+      const a = n.p.t0 + n.p.dir * (Math.PI * 2) * orbitTime / ORBIT_PERIOD;
+      const r = RINGS[n.p.ring].r;
+      n.group.position.set(Math.cos(a) * r, 0, Math.sin(a) * r);
+
+      const active = selected === n || hoveredId === n.p.id;
+      n.emphasis += ((active ? 1 : 0) - n.emphasis) * Math.min(1, dt * 10);
+      n.core.scale.setScalar(1 + n.emphasis * 0.45);
+      n.glow.scale.setScalar(1.15 + n.emphasis * 0.9);
+      n.halo.material.opacity = n.emphasis * 0.9;
+      n.halo.material.rotation += dt * 1.2;
+      n.chip.classList.toggle('hot', hoveredId === n.p.id);
+
+      // fade labels that are far behind
+      n.group.getWorldPosition(nodeWorld);
+      const d = nodeWorld.distanceTo(camera.position);
+      const fade = THREE.MathUtils.clamp(1 - (d - (dist - 2)) / 6, 0.35, 1);
+      n.chip.style.opacity = (active ? 1 : fade).toFixed(2);
+    }
+
+    if (tween) {
+      tween.t += dt * 1000;
+      const k = ease(Math.min(1, tween.t / tween.ms));
+      camDir.copy(camera.position).sub(controls.target).normalize();
+      controls.target.lerpVectors(tween.fromT, tween.toT, k);
+      camera.position.copy(controls.target).addScaledVector(camDir, THREE.MathUtils.lerp(tween.fromD, tween.toD, k));
+      if (tween.t >= tween.ms) tween = null;
+    }
+
+    controls.update();
+    renderer.render(scene, camera);
+    labelRenderer.render(scene, camera);
+  });
+
+  // deep link: index.html#kasirai opens a project directly
+  const hash = location.hash.slice(1);
+  if (byId[hash]) setTimeout(() => select(hash), 400);
+}
+
+main().catch((err) => {
+  console.error(err);
+  showFallback();
+});
+</script>
+</body>
+</html>

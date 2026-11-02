@@ -14,6 +14,14 @@
 
 </div>
 
+<p align="center">
+  <a href="https://saifudinreza.github.io/saifudinreza/">
+    <img src="./assets/orb-3d.svg" alt="Animated 3D project orbit: KasirAI, TrustPay, KostKu, AgentMon and Loka Living orbiting a globe. Click to open the interactive 3D version." width="100%"/>
+  </a>
+  <br/>
+  <sub><b>Click the orb</b> to explore my projects in interactive 3D: drag to rotate, click a planet for details and links.</sub>
+</p>
+
 ## At a Glance
 
 - **3 full-stack apps deployed and live**: [KasirAI](https://sikasirai.com), [TrustPay](https://trust-pay-blush.vercel.app), [KostKu](https://kostku-app-zeta.vercel.app)
@@ -95,12 +103,6 @@ Furniture storefront with a warm, eco-inspired design, animated product transiti
 | **Database** | MySQL, PostgreSQL |
 | **Integrations** | Midtrans, Groq API, Google OAuth, Fonnte WhatsApp, Claude Code Hooks |
 | **DevOps** | Docker, Nginx, Vercel, Railway, Render, Git |
-
-## Contribution Activity
-
-<p align="center">
-  <img src="./profile-3d-contrib/profile-green-animate.svg" alt="3D contribution graph" width="100%"/>
-</p>
 
 ## Currently
 
