@@ -5,11 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Saifudin Reza · Project Orbit 3D</title>
 <meta name="description" content="Interactive 3D map of Saifudin Reza's projects: KasirAI, TrustPay, KostKu, AgentMon and Loka Living.">
-<meta name="theme-color" content="#070f14">
+<meta name="theme-color" content="#03060a">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='14' fill='%2300F7FF'/%3E%3Cellipse cx='32' cy='32' rx='29' ry='10' fill='none' stroke='%2300F7FF' stroke-width='3' transform='rotate(-20 32 32)'/%3E%3C/svg%3E">
 <style>
   :root {
-    --bg: #070f14;
+    --bg: #03060a;
     --ink: #e6fbff;
     --muted: #8fb7bf;
     --cyan: #00f7ff;
@@ -22,7 +22,7 @@
   * { box-sizing: border-box; }
   html, body { margin: 0; height: 100%; }
   body {
-    background: radial-gradient(ellipse at 50% 42%, #0f2a33 0%, #0a1a21 38%, var(--bg) 75%);
+    background: #03060a;
     color: var(--ink);
     font-family: var(--sans);
     overflow: hidden;
@@ -204,7 +204,7 @@
 <script type="module">
 const PROJECTS = [
   {
-    id: 'kasirai', name: 'KasirAI', color: '#00F7FF', ring: 0, t0: 0, dir: 1,
+    id: 'kasirai', name: 'KasirAI', color: '#00F7FF', ring: 0, t0: 0, dir: 1, kind: 'earth', size: 0.25,
     status: 'Live', tag: 'AI-Powered Multi-Tenant POS',
     desc: 'Point of Sale SaaS for Indonesian SMEs with an AI assistant that answers sales questions in natural language from live data.',
     points: [
@@ -220,7 +220,7 @@ const PROJECTS = [
     ]
   },
   {
-    id: 'trustpay', name: 'TrustPay', color: '#7CFFCB', ring: 1, t0: 1.2, dir: -1,
+    id: 'trustpay', name: 'TrustPay', color: '#7CFFCB', ring: 1, t0: 1.2, dir: -1, kind: 'uranus', size: 0.26,
     status: 'Live demo', tag: 'Ledger-Based Digital Wallet',
     desc: 'E-wallet where every rupiah is recorded: top up, peer-to-peer transfer, bill payment, and QR payments.',
     points: [
@@ -236,7 +236,7 @@ const PROJECTS = [
     ]
   },
   {
-    id: 'kostku', name: 'KostKu', color: '#7DB8FF', ring: 2, t0: 2.5, dir: 1,
+    id: 'kostku', name: 'KostKu', color: '#7DB8FF', ring: 2, t0: 2.5, dir: 1, kind: 'neptune', size: 0.27,
     status: 'Live', tag: 'Boarding House Management SaaS',
     desc: 'Dashboard for boarding house owners to manage properties, tenants, and invoices.',
     points: [
@@ -251,7 +251,7 @@ const PROJECTS = [
     ]
   },
   {
-    id: 'agentmon', name: 'AgentMon', color: '#B794FF', ring: 0, t0: Math.PI, dir: 1,
+    id: 'agentmon', name: 'AgentMon', color: '#B794FF', ring: 0, t0: Math.PI, dir: 1, kind: 'mars', size: 0.18,
     status: 'In progress', tag: 'Review Layer for AI Coding Agents',
     desc: 'Local-first tool for reviewing what coding agents like Claude Code want to do, with risk levels and policy rules instead of blind approvals.',
     points: [
@@ -265,7 +265,7 @@ const PROJECTS = [
     note: 'Private until beta'
   },
   {
-    id: 'loka', name: 'Loka Living', color: '#FFC46B', ring: 1, t0: 1.2 + Math.PI, dir: -1,
+    id: 'loka', name: 'Loka Living', color: '#FFC46B', ring: 1, t0: 1.2 + Math.PI, dir: -1, kind: 'saturn', size: 0.24,
     status: 'In progress', tag: 'Furniture E-Commerce',
     desc: 'Furniture storefront with a warm, eco-inspired design, animated product transitions, and a full checkout flow. Built spec-first from a PRD and technical docs.',
     points: [],
@@ -307,15 +307,22 @@ async function main() {
   const THREE = await import('three');
   const { OrbitControls } = await import('three/addons/controls/OrbitControls.js');
   const { CSS2DRenderer, CSS2DObject } = await import('three/addons/renderers/CSS2DRenderer.js');
+  const { EffectComposer } = await import('three/addons/postprocessing/EffectComposer.js');
+  const { RenderPass } = await import('three/addons/postprocessing/RenderPass.js');
+  const { UnrealBloomPass } = await import('three/addons/postprocessing/UnrealBloomPass.js');
+  const { OutputPass } = await import('three/addons/postprocessing/OutputPass.js');
+  const { createBodies } = await import('./bodies.js');
 
   const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const rad = THREE.MathUtils.degToRad;
   const stage = $('stage');
 
   // ---------- renderer, camera, controls
-  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
+  const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  renderer.setClearColor(0x000000, 0);
+  renderer.setClearColor(0x03060a, 1);
+  renderer.toneMapping = THREE.NeutralToneMapping;
+  renderer.toneMappingExposure = 1.0;
   stage.appendChild(renderer.domElement);
 
   const labelRenderer = new CSS2DRenderer();
@@ -326,32 +333,48 @@ async function main() {
   const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 300);
   camera.position.set(0, 3.0, 10);
 
+  const composer = new EffectComposer(renderer);
+  composer.addPass(new RenderPass(scene, camera));
+  const bloom = new UnrealBloomPass(new THREE.Vector2(256, 256), 0.45, 0.3, 0.95);
+  composer.addPass(bloom);
+  composer.addPass(new OutputPass());
+
   const controls = new OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true;
   controls.dampingFactor = 0.06;
   controls.enablePan = false;
-  controls.minDistance = 3.5;
+  controls.minDistance = 2.0;
   controls.maxDistance = 24;
   controls.autoRotate = !reduceMotion;
   controls.autoRotateSpeed = 0.55;
 
-  // ---------- textures
-  function glowTexture() {
-    const c = document.createElement('canvas');
-    c.width = c.height = 128;
-    const g = c.getContext('2d');
-    const grd = g.createRadialGradient(64, 64, 0, 64, 64, 64);
-    grd.addColorStop(0, 'rgba(255,255,255,1)');
-    grd.addColorStop(0.25, 'rgba(255,255,255,.45)');
-    grd.addColorStop(1, 'rgba(255,255,255,0)');
-    g.fillStyle = grd;
-    g.fillRect(0, 0, 128, 128);
-    const t = new THREE.CanvasTexture(c);
-    t.colorSpace = THREE.SRGBColorSpace;
-    return t;
-  }
-  const glowTex = glowTexture();
 
+  // ---------- sun
+  const bodies = createBodies(THREE);
+  const SUN_R = 1.25;
+  const sun = bodies.sun(SUN_R);
+  scene.add(sun.group);
+
+  // ---------- orbit rings
+  const RINGS = [
+    { r: 2.85, incl: 22, yaw: 10 },
+    { r: 3.3, incl: -30, yaw: -35 },
+    { r: 2.55, incl: 72, yaw: -25 }
+  ];
+  const pivots = RINGS.map((def) => {
+    const pivot = new THREE.Group();
+    pivot.rotation.set(rad(def.incl), rad(def.yaw), 0, 'YXZ');
+    const ring = new THREE.Mesh(
+      new THREE.TorusGeometry(def.r, 0.005, 6, 256),
+      new THREE.MeshBasicMaterial({ color: 0x9fb4c4, transparent: true, opacity: 0.16, depthWrite: false })
+    );
+    ring.rotation.x = Math.PI / 2;
+    pivot.add(ring);
+    scene.add(pivot);
+    return pivot;
+  });
+
+  // dashed selection halo (UI only)
   function ringTexture() {
     const c = document.createElement('canvas');
     c.width = c.height = 128;
@@ -368,76 +391,21 @@ async function main() {
   }
   const ringTex = ringTexture();
 
-  // ---------- globe
-  const R = 1.6;
-  const globe = new THREE.Group();
-  globe.rotation.z = rad(18);
-  scene.add(globe);
-  const spin = new THREE.Group();
-  globe.add(spin);
-
-  spin.add(new THREE.Mesh(
-    new THREE.SphereGeometry(R, 48, 32),
-    new THREE.MeshBasicMaterial({ color: 0x0a3540, transparent: true, opacity: 0.7, depthWrite: false })
-  ));
-  spin.add(new THREE.LineSegments(
-    new THREE.EdgesGeometry(new THREE.SphereGeometry(R * 1.003, 18, 12), 1),
-    new THREE.LineBasicMaterial({ color: 0x00f7ff, transparent: true, opacity: 0.38 })
-  ));
-  const equator = new THREE.Mesh(
-    new THREE.TorusGeometry(R * 1.004, 0.007, 6, 128),
-    new THREE.MeshBasicMaterial({ color: 0x00f7ff, transparent: true, opacity: 0.8 })
-  );
-  equator.rotation.x = Math.PI / 2;
-  spin.add(equator);
-
-  // soft atmosphere (fresnel rim)
-  scene.add(new THREE.Mesh(
-    new THREE.SphereGeometry(R * 1.16, 48, 32),
-    new THREE.ShaderMaterial({
-      side: THREE.BackSide, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
-      vertexShader: 'varying vec3 vN; void main(){ vN = normalize(normalMatrix * normal); gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
-      fragmentShader: 'varying vec3 vN; void main(){ float rim = 1.0 - abs(dot(vN, vec3(0.0, 0.0, 1.0))); float i = pow(rim, 3.0); gl_FragColor = vec4(0.0, 0.97, 1.0, 1.0) * i * 0.45; }'
-    })
-  ));
-
-  // ---------- orbit rings
-  const RINGS = [
-    { r: 2.85, incl: 22, yaw: 10 },
-    { r: 3.3, incl: -30, yaw: -35 },
-    { r: 2.55, incl: 72, yaw: -25 }
-  ];
-  const pivots = RINGS.map((def) => {
-    const pivot = new THREE.Group();
-    pivot.rotation.set(rad(def.incl), rad(def.yaw), 0, 'YXZ');
-    const ring = new THREE.Mesh(
-      new THREE.TorusGeometry(def.r, 0.008, 6, 200),
-      new THREE.MeshBasicMaterial({ color: 0x2fd0dc, transparent: true, opacity: 0.32 })
-    );
-    ring.rotation.x = Math.PI / 2;
-    pivot.add(ring);
-    scene.add(pivot);
-    return pivot;
-  });
-
-  // ---------- project nodes
-  const nodes = PROJECTS.map((p) => {
+  // ---------- project planets
+  const nodes = PROJECTS.map((p, i) => {
     const group = new THREE.Group();
     pivots[p.ring].add(group);
-    const color = new THREE.Color(p.color);
 
-    const core = new THREE.Mesh(new THREE.SphereGeometry(0.17, 32, 16), new THREE.MeshBasicMaterial({ color }));
-    const glow = new THREE.Sprite(new THREE.SpriteMaterial({
-      map: glowTex, color, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0.9
-    }));
-    glow.scale.setScalar(1.15);
+    const planet = bodies.planet(p.kind, p.size, i * 7.31 + 1.7);
+    group.add(planet.group);
+
     const halo = new THREE.Sprite(new THREE.SpriteMaterial({
-      map: ringTex, color, transparent: true, depthWrite: false, opacity: 0
+      map: ringTex, color: new THREE.Color(p.color), transparent: true, depthWrite: false, opacity: 0, toneMapped: false
     }));
-    halo.scale.setScalar(0.85);
-    const hit = new THREE.Mesh(new THREE.SphereGeometry(0.5, 12, 8), new THREE.MeshBasicMaterial({ visible: false }));
+    halo.scale.setScalar(p.size * (p.kind === 'saturn' ? 5.4 : 3.0));
+    const hit = new THREE.Mesh(new THREE.SphereGeometry(Math.max(0.5, p.size * 2), 12, 8), new THREE.MeshBasicMaterial({ visible: false }));
     hit.userData.id = p.id;
-    group.add(core, glow, halo, hit);
+    group.add(halo, hit);
 
     const chip = el('button', { type: 'button', className: 'chip' }, p.name);
     chip.style.setProperty('--c', p.color);
@@ -446,33 +414,40 @@ async function main() {
     chip.addEventListener('click', () => select(p.id));
     chip.addEventListener('pointerenter', () => { hoveredId = p.id; });
     chip.addEventListener('pointerleave', () => { if (hoveredId === p.id) hoveredId = null; });
-    const label = new CSS2DObject(chip);
-    label.center.set(0.5, -0.9);   // sit just below the planet on screen, whatever the ring tilt
+    const holder = el('div');
+    holder.append(chip);
+    const label = new CSS2DObject(holder);
+    label.center.set(0.5, 0);   // top of the holder sits on the planet centre; chip is pushed below the disc each frame
     group.add(label);
 
-    return { p, group, core, glow, halo, hit, chip, emphasis: 0 };
+    return { p, group, planet, halo, hit, chip, emphasis: 0 };
   });
   const byId = Object.fromEntries(nodes.map((n) => [n.p.id, n]));
 
-  // ---------- particles and stars
-  function pointCloud(count, rMin, rMax, flatten, size, color, opacity) {
+  // ---------- star field (varied size and temperature)
+  function starField(count, rMin, rMax) {
     const pos = new Float32Array(count * 3);
+    const col = new Float32Array(count * 3);
+    const tints = [[0.75, 0.82, 1.0], [1.0, 1.0, 1.0], [1.0, 0.92, 0.78], [1.0, 0.8, 0.62]];
     for (let i = 0; i < count; i++) {
       const r = rMin + Math.random() * (rMax - rMin);
-      const u = (Math.random() * 2 - 1) * flatten;
+      const u = Math.random() * 2 - 1;
       const a = Math.random() * Math.PI * 2;
       const s = Math.sqrt(1 - u * u);
       pos.set([r * s * Math.cos(a), r * u, r * s * Math.sin(a)], i * 3);
+      const t = tints[(Math.random() * tints.length) | 0];
+      const b = 0.25 + Math.pow(Math.random(), 3) * 0.75;
+      col.set([t[0] * b, t[1] * b, t[2] * b], i * 3);
     }
     const geo = new THREE.BufferGeometry();
     geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
     return new THREE.Points(geo, new THREE.PointsMaterial({
-      color, size, transparent: true, opacity, depthWrite: false, blending: THREE.AdditiveBlending, sizeAttenuation: true
+      size: 0.22, vertexColors: true, transparent: true, depthWrite: false, sizeAttenuation: true
     }));
   }
-  const dust = pointCloud(900, 2.2, 7.5, 0.35, 0.035, 0xbffcff, 0.65);
-  const stars = pointCloud(1400, 35, 80, 1, 0.16, 0xe6ffff, 0.75);
-  scene.add(dust, stars);
+  const stars = starField(2600, 40, 90);
+  scene.add(stars);
 
   // ---------- layout & sizing
   function baseDistance() {
@@ -484,6 +459,8 @@ async function main() {
   function resize() {
     const w = stage.clientWidth, h = stage.clientHeight;
     renderer.setSize(w, h);
+    composer.setSize(w, h);
+    bloom.resolution.set(w / 2, h / 2);
     labelRenderer.setSize(w, h);
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
@@ -515,13 +492,15 @@ async function main() {
     $('p-actions').replaceChildren(...actions);
   }
 
-  function flyTo(target, dist, ms = 900) {
+  function flyTo(target, dist, dir = null, ms = 1100) {
     tween = {
       t: 0, ms,
       fromT: controls.target.clone(), toT: target.clone(),
-      fromD: camera.position.distanceTo(controls.target), toD: dist
+      fromD: camera.position.distanceTo(controls.target), toD: dist,
+      fromDir: camera.position.clone().sub(controls.target).normalize(), toDir: dir
     };
   }
+  const probe = new THREE.PerspectiveCamera();
 
   function select(id) {
     const n = byId[id];
@@ -534,9 +513,16 @@ async function main() {
     document.body.classList.add('has-panel');
     scene.updateMatrixWorld();
     const pos = n.group.getWorldPosition(new THREE.Vector3());
-    if (innerWidth <= 720) pos.add(new THREE.Vector3(0, -1.9, 0).applyQuaternion(camera.quaternion)); // keep node above the bottom sheet
-    else pos.add(new THREE.Vector3(-0.9, 0, 0).applyQuaternion(camera.quaternion)); // shift right of panel
-    flyTo(pos, 6.2);
+    // view the planet from its sunlit side, slightly above the orbit
+    const radial = pos.clone().normalize();
+    const tangent = new THREE.Vector3(0, 1, 0).cross(radial).normalize();
+    const dir = radial.multiplyScalar(-0.7).add(tangent).add(new THREE.Vector3(0, 0.5, 0)).normalize();
+    const dist = innerWidth <= 720 ? 4.4 : 3.1;
+    probe.position.copy(pos).addScaledVector(dir, dist);
+    probe.lookAt(pos);
+    if (innerWidth <= 720) pos.add(new THREE.Vector3(0, -1.05, 0).applyQuaternion(probe.quaternion)); // keep planet above the bottom sheet
+    else pos.add(new THREE.Vector3(-0.75, 0, 0).applyQuaternion(probe.quaternion)); // shift right of panel
+    flyTo(pos, dist, dir);
   }
 
   function closePanel() {
@@ -610,6 +596,7 @@ async function main() {
   const camDir = new THREE.Vector3();
   const ease = (k) => 1 - Math.pow(1 - k, 3);
   const nodeWorld = new THREE.Vector3();
+  const rayDir = new THREE.Vector3();
 
   addEventListener('resize', resize);
   resize();
@@ -622,8 +609,9 @@ async function main() {
     if (!holding) orbitTime += dt * speed;
     controls.autoRotate = !reduceMotion && !holding && !userHold;
 
-    spin.rotation.y += dt * speed * (Math.PI * 2 / 40);
-    dust.rotation.y += dt * speed * 0.03;
+    bodies.uTime.value += dt * speed;
+    sun.surface.rotation.y += dt * speed * (Math.PI * 2 / 90);
+    sun.corona.quaternion.copy(camera.quaternion);
     stars.rotation.y -= dt * 0.004;
 
     const dist = camera.position.distanceTo(controls.target);
@@ -634,30 +622,42 @@ async function main() {
 
       const active = selected === n || hoveredId === n.p.id;
       n.emphasis += ((active ? 1 : 0) - n.emphasis) * Math.min(1, dt * 10);
-      n.core.scale.setScalar(1 + n.emphasis * 0.45);
-      n.glow.scale.setScalar(1.15 + n.emphasis * 0.9);
+      n.planet.group.scale.setScalar(1 + n.emphasis * 0.18);
+      n.planet.body.rotation.y += dt * speed * 0.35;
+      n.planet.update();
       n.halo.material.opacity = n.emphasis * 0.9;
       n.halo.material.rotation += dt * 1.2;
       n.chip.classList.toggle('hot', hoveredId === n.p.id);
 
-      // fade labels that are far behind
+      // fade labels that are far behind, hide ones eclipsed by the sun
       n.group.getWorldPosition(nodeWorld);
       const d = nodeWorld.distanceTo(camera.position);
-      const fade = THREE.MathUtils.clamp(1 - (d - (dist - 2)) / 6, 0.35, 1);
+      let fade = THREE.MathUtils.clamp(1 - (d - (dist - 2)) / 6, 0.35, 1);
+      rayDir.copy(nodeWorld).sub(camera.position).normalize();
+      const along = -camera.position.dot(rayDir);
+      const miss = camera.position.clone().addScaledVector(rayDir, along).length();
+      if (along > 0 && along < d && miss < SUN_R * 1.05) fade = 0.08;
       n.chip.style.opacity = (active ? 1 : fade).toFixed(2);
+      const pxPerUnit = stage.clientHeight / (2 * Math.tan(rad(camera.fov / 2)) * d);
+      const reach = n.p.size * (n.p.kind === 'saturn' ? 1.25 : 1) * (1 + n.emphasis * 0.18);
+      n.chip.style.marginTop = `${Math.round(reach * pxPerUnit + 6 + n.emphasis * 8)}px`;
+      n.chip.style.pointerEvents = fade < 0.1 && !active ? 'none' : '';
     }
 
     if (tween) {
       tween.t += dt * 1000;
       const k = ease(Math.min(1, tween.t / tween.ms));
-      camDir.copy(camera.position).sub(controls.target).normalize();
+      if (tween.toDir) camDir.copy(tween.fromDir).lerp(tween.toDir, k).normalize();
+      else camDir.copy(camera.position).sub(controls.target).normalize();
       controls.target.lerpVectors(tween.fromT, tween.toT, k);
-      camera.position.copy(controls.target).addScaledVector(camDir, THREE.MathUtils.lerp(tween.fromD, tween.toD, k));
+      // arc outward mid-flight so the camera never passes through the sun
+      const lift = tween.toDir ? Math.sin(Math.PI * k) * 2.2 : 0;
+      camera.position.copy(controls.target).addScaledVector(camDir, THREE.MathUtils.lerp(tween.fromD, tween.toD, k) + lift);
       if (tween.t >= tween.ms) tween = null;
     }
 
     controls.update();
-    renderer.render(scene, camera);
+    composer.render();
     labelRenderer.render(scene, camera);
   });
 
