@@ -16,7 +16,7 @@
 
 <p align="center">
   <a href="https://saifudinreza.github.io/saifudinreza/">
-    <img src="./assets/orb-3d.svg" alt="Animated 3D project orbit: KasirAI, TrustPay, KostKu, AgentMon and Loka Living orbiting a globe. Click to open the interactive 3D version." width="100%"/>
+    <img src="./assets/orb-3d.svg" alt="Animated solar system: KasirAI, TrustPay, KostKu, AgentMon and Loka Living as planets orbiting a realistic sun. Click to open the interactive 3D version." width="100%"/>
   </a>
   <br/>
   <sub><b>Click the orb</b> to explore my projects in interactive 3D: drag to rotate, click a planet for details and links.</sub>
