@@ -1,6 +1,8 @@
 <div align="center">
 
-<img src="https://capsule-render.vercel.app/api?type=waving&color=0:0F2027,50:16697A,100:00F7FF&height=160&section=header&text=Saifudin%20Reza&fontSize=44&fontColor=ffffff&fontAlignY=38&desc=Full%20Stack%20Developer%20%7C%20Laravel%20%2B%20Next.js%20%7C%20AI-Integrated%20SaaS&descSize=16&descAlignY=58" width="100%"/>
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:0F2027,50:16697A,100:00F7FF&height=180&section=header&text=Saifudin%20Reza&fontSize=44&fontColor=ffffff&fontAlignY=38&animation=fadeIn" width="100%"/>
+
+<img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=20&duration=3000&pause=800&color=00A8B5&center=true&vCenter=true&width=650&height=45&lines=Full+Stack+Developer;Laravel+%2B+Next.js+%2B+AI-Integrated+SaaS;Open+to+Junior+Software+Engineer+roles" alt="Full Stack Developer, Laravel + Next.js + AI-Integrated SaaS, open to Junior Software Engineer roles"/>
 
 **I build and deploy full-stack web apps: multi-tenant SaaS, real payment gateways, and AI features on live data.**
 
@@ -18,7 +20,7 @@
 - **End-to-end ownership**: database design, REST API, frontend, payments, Docker, deployment, DNS
 - **Payments and AI in live apps**: Midtrans in production mode (per-tenant keys, webhooks) and Groq Llama querying live sales data
 - **Dibimbing.id Full Stack Web Development Bootcamp** graduate, score 97.26 (A+)
-- Final-semester **Information Systems** student at Universitas Terbuka, building in the evenings alongside a full-time job
+- **Information Systems** graduate from Universitas Terbuka, building in the evenings alongside a full-time job
 
 ## Featured Projects
 
@@ -62,8 +64,6 @@ Dashboard for boarding house owners to manage properties, tenants, and invoices.
 
 ### AgentMon · Review Layer for AI Coding Agents (in progress, private until beta)
 
-Local-first tool for reviewing what coding agents like Claude Code want to do, with risk levels and 
-
 Local-first tool for reviewing what coding agents like Claude Code want to do, with risk levels and policy rules instead of blind approvals.
 
 - Local daemon that receives Claude Code HTTP hooks, bound to `127.0.0.1` only
@@ -83,6 +83,10 @@ Furniture storefront with a warm, eco-inspired design, animated product transiti
 
 ## Tech Stack
 
+<p align="center">
+  <img src="https://skillicons.dev/icons?i=php,ts,js,laravel,nextjs,react,tailwind,bun,mysql,postgres,docker,nginx,vercel,git&perline=7" alt="PHP, TypeScript, JavaScript, Laravel, Next.js, React, Tailwind CSS, Bun, MySQL, PostgreSQL, Docker, Nginx, Vercel, Git"/>
+</p>
+
 | Area | Tools |
 |---|---|
 | **Languages** | PHP, TypeScript, JavaScript, SQL |
@@ -92,8 +96,16 @@ Furniture storefront with a warm, eco-inspired design, animated product transiti
 | **Integrations** | Midtrans, Groq API, Google OAuth, Fonnte WhatsApp, Claude Code Hooks |
 | **DevOps** | Docker, Nginx, Vercel, Railway, Render, Git |
 
+## Contribution Activity
+
+<p align="center">
+  <img src="./profile-3d-contrib/profile-green-animate.svg" alt="3D contribution graph" width="100%"/>
+</p>
+
 ## Currently
 
 - Building **AgentMon**, a local-first review layer for AI coding agents
 - Continuing **Loka Living** on a TypeScript backend (Bun + Elysia + Drizzle)
 - Practicing data structures and algorithms
+
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:00F7FF,50:16697A,100:0F2027&height=100&section=footer&animation=fadeIn" width="100%"/>
